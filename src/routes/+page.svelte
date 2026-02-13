@@ -4,10 +4,14 @@
 	import Circle from '$lib/components/circle.svelte';
 	import Time from '$lib/components/time.svelte';
 
+	const TOTAL_TIME = 25 * 60;
+
 	let isActive = $state(false);
 	let isPaused = $state(false);
-	let countdown = $state(25 * 60);
+	let countdown = $state(TOTAL_TIME);
 	let interval: any;
+
+	let progress = $derived(countdown / TOTAL_TIME);
 
 	function startTimer() {
 		isActive = true;
@@ -40,7 +44,7 @@
 		clearInterval(interval);
 		isActive = false;
 		isPaused = false;
-		countdown = 25 * 60;
+		countdown = TOTAL_TIME;
 	}
 
 	onDestroy(() => {
@@ -49,13 +53,13 @@
 </script>
 
 <main
-	class="flex min-h-screen w-screen flex-col items-center justify-center bg-emerald-950 text-lime-200"
+	class="relative flex min-h-screen w-screen flex-col items-center justify-center bg-emerald-950 text-lime-200"
 >
-	<Circle progress={1} />
+	<Circle {progress} {countdown} {isActive}>
+		<Logo />
+	</Circle>
 
 	{#if isActive}
-		<Time time={countdown} />
-
 		<div class="z-10 mt-8 flex gap-4">
 			{#if isPaused}
 				<button
@@ -80,13 +84,10 @@
 				Cancel
 			</button>
 		</div>
-	{/if}
-
-	{#if !isActive}
-		<Logo />
+	{:else}
 		<button
 			onclick={startTimer}
-			class="mt-4 cursor-pointer rounded-full bg-emerald-800 px-4 py-2 text-white transition hover:bg-emerald-700"
+			class="mt-8 cursor-pointer rounded-full bg-emerald-800 px-4 py-2 text-white transition hover:bg-emerald-700"
 		>
 			Start 25 min focus
 		</button>
